@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procedure Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Register Users for Procedures</h2>
+
+<button class="save-button" type="submit">Save</button>
+
+<table id="procedureTable">
+    <thead>
+        <tr>
+            <th>Time (დრო)</th>
+            <th>Name (სახელი)</th>
+            <th>Procedure (პროცედურა)</th>
+            <th>Total Amount (სრული თანხა)</th>
+            <th>Salary (ხელფასი - 60%)</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+        <!-- Rows will be dynamically generated -->
+    </tbody>
+</table>
+
+<button onclick="addRow()">Add Row</button>
+
+<script>
+    // Function to generate times from 8 AM to 12 midnight in 30-minute intervals
+    function generateTimes() {
+        const times = [];
+        let hour = 8;
+        let minute = 0;
+        const meridiem = ['AM', 'PM'];
+
+        while (hour < 24) {
+            let formattedHour = (hour > 12) ? hour - 12 : hour;
+            let time = `${formattedHour}:${minute === 0 ? '00' : minute} ${hour < 12 ? meridiem[0] : meridiem[1]}`;
+            times.push(time);
+            
+            minute += 30;
+            if (minute === 60) {
+                minute = 0;
+                hour++;
+            }
+        }
+        return times;
+    }
+
+    // Automatically generate rows based on time intervals
+    function populateTable() {
+        const times = generateTimes();
+        const table = document.getElementById('tableBody');
+
+        times.forEach(time => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${time}</td>
+                <td><input type="text" name="name" placeholder="Enter name"></td>
+                <td><input type="text" name="procedure" placeholder="Enter procedure"></td>
+                <td><input type="number" name="amount" placeholder="Enter amount" oninput="calculateSalary(this)"></td>
+                <td><input type="text" name="salary" placeholder="Salary" readonly></td>
+            `;
+            table.appendChild(row);
+        });
+    }
+
+    // Function to add an additional row without a time entry
+    function addRow() {
+        const table = document.getElementById('tableBody');
+        const newRow = document.createElement('tr');
+        
+        newRow.innerHTML = `
+            <td>--</td>
+            <td><input type="text" name="name" placeholder="Enter name"></td>
+            <td><input type="text" name="procedure" placeholder="Enter procedure"></td>
+            <td><input type="number" name="amount" placeholder="Enter amount" oninput="calculateSalary(this)"></td>
+            <td><input type="text" name="salary" placeholder="Salary" readonly></td>
+        `;
+
+        table.appendChild(newRow);
+    }
+
+    // Function to calculate 60% of the total amount
+    function calculateSalary(element) {
+        const totalAmount = parseFloat(element.value) || 0;
+        const salaryCell = element.parentElement.nextElementSibling.firstElementChild;
+        const salary = totalAmount * 0.60;
+        salaryCell.value = salary.toFixed(2);
+    }
+
+    // Populate table on page load with times from 8 AM to midnight
+    window.onload = populateTable;
+</script>
+
+</body>
+</html>
